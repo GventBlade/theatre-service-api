@@ -20,8 +20,9 @@ from django.conf.urls.static import static
 from django.contrib.messages import api
 from django.urls import path, include
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('Theatre.urls')),
+    path("admin/", admin.site.urls),
+    path("api/theatre/", include("Theatre.urls")),
+    path("api/user/", include("user.urls")),
 ]
 
 if settings.DEBUG:
