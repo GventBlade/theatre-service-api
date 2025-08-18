@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Theatre.apps.TheatreConfig',
-    'user'
+    'user',
+    "debug_toolbar"
 ]
 
 AUTH_USER_MODEL = 'user.User'
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 REST_FRAMEWORK = {
@@ -66,6 +68,8 @@ REST_FRAMEWORK = {
         "user": "1000/day",
         "anon": "30/day",
     },
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
 }
 
 ROOT_URLCONF = 'theatre_service_api.urls'
@@ -149,3 +153,8 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
