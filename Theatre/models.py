@@ -5,6 +5,7 @@ from django.db import models
 class Play(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
+    image = models.ImageField(upload_to="plays/", blank=True, null=True)
 
     def __str__(self):
         return f"Title:{self.title}, Description:{self.description}"
@@ -31,17 +32,21 @@ class Performance(models.Model):
 class Actor(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    play = models.ManyToManyField(Play)
+    plays = models.ManyToManyField(Play, related_name="actors")
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
     def __str__(self):
-        return f"First Name:{self.first_name}, Last Name:{self.last_name}"
+        return f"First Name:{self.first_name}, Last Name:{self.last_name}, Plays:{self.plays}"
 
 class Genre(models.Model):
     name = models.CharField(max_length=100)
-    play = models.ManyToManyField(Play)
+    plays = models.ManyToManyField(Play, related_name="genres")
 
     def __str__(self):
-        return f"Name:{self.name}"
+        return f"Name:{self.name}, Plays:{self.plays}"
 
 
 class Reservation(models.Model):
@@ -57,6 +62,9 @@ class Ticket(models.Model):
     seat = models.IntegerField()
     performance =models.ForeignKey(Performance, on_delete=models.CASCADE)
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("row", "seat", "performance")
 
     def __str__(self):
         return f"Row: {self.row}, Seat: {self.seat}, Performance: {self.performance}, Reservation: {self.reservation} "
