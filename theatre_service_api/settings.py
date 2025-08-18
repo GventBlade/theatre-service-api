@@ -68,6 +68,7 @@ REST_FRAMEWORK = {
         "user": "1000/day",
         "anon": "30/day",
     },
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
@@ -158,3 +159,10 @@ INTERNAL_IPS = [
     "127.0.0.1",
     "localhost",
 ]
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Theatre API',
+    'DESCRIPTION': 'API documentation for Theatre project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
