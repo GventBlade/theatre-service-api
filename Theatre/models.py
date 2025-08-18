@@ -28,6 +28,28 @@ class Performance(models.Model):
     def __str__(self):
         return f"Play:{self.play}, TheatreHall:{self.theatre_hall}, Show Time:{self.show_time}"
 
+    @property
+    def total_seats(self):
+        return self.theatre_hall.rows * self.theatre_hall.seats_in_row
+
+    @property
+    def reserved_seats_count(self):
+        return self.ticket_set.count()
+
+    @property
+    def available_seats_count(self):
+        return self.total_seats - self.reserved_seats_count
+
+    @property
+    def available_seats(self):
+        reserved = {(t.row, t.seat) for t in self.ticket_set.all()}
+        free = []
+        for r in range(1, self.theatre_hall.rows + 1):
+            for s in range(1, self.theatre_hall.seats_in_row + 1):
+                if (r, s) not in reserved:
+                    free.append({"row": r, "seat": s})
+        return free
+
 
 class Actor(models.Model):
     first_name = models.CharField(max_length=100)
