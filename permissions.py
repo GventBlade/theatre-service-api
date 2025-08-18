@@ -1,26 +1,13 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class IsAdminOrTicketBuyer(permissions.BasePermission):
+class IsAdminALLOrIsAuthenticatedOrReadOnly(BasePermission):
+    """
+    The request is authenticated as an admin - read/write, or if is a read-only request.
+    """
 
     def has_permission(self, request, view):
-        if request.user.is_staff:
-            return True
-
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        if request.user.is_authenticated and request.method == "POST":
-            return True
-
-        return False
-
-
-class IsAdminOrOwner(permissions.BasePermission):
-
-
-    def has_object_permission(self, request, view, obj):
-        if request.user.is_staff:
-            return True
-
-        return obj == request.user
+        return bool(
+            request.method in SAFE_METHODS and request.user and request.user.is_authenticated
+            or (request.user and request.user.is_staff)
+        )

@@ -1,18 +1,23 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import get_user_model
-from user.serializers import UserSerializer
-from permissions import  IsAdminOrOwner
+from rest_framework import generics, permissions
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
 
-User = get_user_model()
+from user.serializers import UserSerializer, AuthTokenSerializer
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+
+class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrOwner]
+    permission_classes = ()
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:
-            return User.objects.all()
-        return User.objects.filter(id=user.id)
+
+class LoginUserView(ObtainAuthToken):
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+    serializer_class = AuthTokenSerializer
+
+
+class ManageUserView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user
