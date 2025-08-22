@@ -1,0 +1,437 @@
+[
+  {
+    "model": "Theatre.play",
+    "pk": 1,
+    "fields": {
+      "title": "Hamlet",
+      "description": "A tragedy by William Shakespeare"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 2,
+    "fields": {
+      "title": "Romeo and Juliet",
+      "description": "A tragic love story by William Shakespeare"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 3,
+    "fields": {
+      "title": "King Lear",
+      "description": "A tragedy about power and madness"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 4,
+    "fields": {
+      "title": "A Midsummer Night's Dream",
+      "description": "A comedy by William Shakespeare"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 5,
+    "fields": {
+      "title": "Uncle Vanya",
+      "description": "A play by Anton Chekhov"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 6,
+    "fields": {
+      "title": "The Cherry Orchard",
+      "description": "A play by Anton Chekhov about a family's struggle"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 7,
+    "fields": {
+      "title": "Waiting for Godot",
+      "description": "An absurdist play by Samuel Beckett"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 8,
+    "fields": {
+      "title": "Death of a Salesman",
+      "description": "A tragedy by Arthur Miller"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 9,
+    "fields": {
+      "title": "The Glass Menagerie",
+      "description": "A memory play by Tennessee Williams"
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 10,
+    "fields": {
+      "title": "Our Town",
+      "description": "A play by Thornton Wilder"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 1,
+    "fields": {
+      "name": "Tragedy"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 2,
+    "fields": {
+      "name": "Comedy"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 3,
+    "fields": {
+      "name": "Drama"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 4,
+    "fields": {
+      "name": "Musical"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 5,
+    "fields": {
+      "name": "Absurdist"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 6,
+    "fields": {
+      "name": "Fantasy"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 7,
+    "fields": {
+      "name": "Historical"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 8,
+    "fields": {
+      "name": "Thriller"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 9,
+    "fields": {
+      "name": "Romance"
+    }
+  },
+  {
+    "model": "Theatre.genre",
+    "pk": 10,
+    "fields": {
+      "name": "Family"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 1,
+    "fields": {
+      "first_name": "John",
+      "last_name": "Smith"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 2,
+    "fields": {
+      "first_name": "Jane",
+      "last_name": "Doe"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 3,
+    "fields": {
+      "first_name": "Michael",
+      "last_name": "Johnson"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 4,
+    "fields": {
+      "first_name": "Emily",
+      "last_name": "Davis"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 5,
+    "fields": {
+      "first_name": "Chris",
+      "last_name": "Evans"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 6,
+    "fields": {
+      "first_name": "Sarah",
+      "last_name": "Miller"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 7,
+    "fields": {
+      "first_name": "David",
+      "last_name": "Wilson"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 8,
+    "fields": {
+      "first_name": "Olivia",
+      "last_name": "Moore"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 9,
+    "fields": {
+      "first_name": "James",
+      "last_name": "Taylor"
+    }
+  },
+  {
+    "model": "Theatre.actor",
+    "pk": 10,
+    "fields": {
+      "first_name": "Sophia",
+      "last_name": "Anderson"
+    }
+  },
+  {
+    "model": "Theatre.theatrehall",
+    "pk": 1,
+    "fields": {
+      "name": "Main Hall",
+      "rows": 20,
+      "seats_in_row": 30
+    }
+  },
+  {
+    "model": "Theatre.theatrehall",
+    "pk": 2,
+    "fields": {
+      "name": "Small Stage",
+      "rows": 10,
+      "seats_in_row": 15
+    }
+  },
+  {
+    "model": "Theatre.theatrehall",
+    "pk": 3,
+    "fields": {
+      "name": "Concert Hall",
+      "rows": 25,
+      "seats_in_row": 40
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+      "email": "user1@example.com",
+      "username": "user1@example.com",
+      "password": "pbkdf2_sha256$260000$hQ1lG3f9d5y2eL7b$F9g2h1j3k4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4",
+      "is_staff": false,
+      "is_active": true
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 2,
+    "fields": {
+      "email": "user2@example.com",
+      "username": "user2@example.com",
+      "password": "pbkdf2_sha256$260000$hQ1lG3f9d5y2eL7b$F9g2h1j3k4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4",
+      "is_staff": false,
+      "is_active": true
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 1,
+    "fields": {
+      "play": 1,
+      "theatre_hall": 1,
+      "show_time": "2025-11-20T19:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 2,
+    "fields": {
+      "play": 2,
+      "theatre_hall": 2,
+      "show_time": "2025-12-15T20:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 3,
+    "fields": {
+      "play": 3,
+      "theatre_hall": 1,
+      "show_time": "2025-11-21T19:30:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 4,
+    "fields": {
+      "play": 4,
+      "theatre_hall": 2,
+      "show_time": "2025-12-25T15:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 5,
+    "fields": {
+      "play": 5,
+      "theatre_hall": 1,
+      "show_time": "2025-11-22T20:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 6,
+    "fields": {
+      "play": 6,
+      "theatre_hall": 3,
+      "show_time": "2025-12-01T18:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 7,
+    "fields": {
+      "play": 7,
+      "theatre_hall": 2,
+      "show_time": "2025-11-30T19:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 8,
+    "fields": {
+      "play": 8,
+      "theatre_hall": 1,
+      "show_time": "2025-12-05T20:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 9,
+    "fields": {
+      "play": 9,
+      "theatre_hall": 3,
+      "show_time": "2025-12-10T19:30:00Z"
+    }
+  },
+  {
+    "model": "Theatre.performance",
+    "pk": 10,
+    "fields": {
+      "play": 10,
+      "theatre_hall": 1,
+      "show_time": "2025-12-18T19:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.reservation",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "created_at": "2025-08-18T20:00:00Z"
+    }
+  },
+  {
+    "model": "Theatre.reservation",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "created_at": "2025-08-18T20:01:00Z"
+    }
+  },
+  {
+    "model": "Theatre.ticket",
+    "pk": 1,
+    "fields": {
+      "row": 1,
+      "seat": 1,
+      "performance": 1,
+      "reservation": 1
+    }
+  },
+  {
+    "model": "Theatre.ticket",
+    "pk": 2,
+    "fields": {
+      "row": 1,
+      "seat": 2,
+      "performance": 1,
+      "reservation": 1
+    }
+  },
+  {
+    "model": "Theatre.ticket",
+    "pk": 3,
+    "fields": {
+      "row": 5,
+      "seat": 10,
+      "performance": 2,
+      "reservation": 2
+    }
+  },
+  {
+    "model": "Theatre.ticket",
+    "pk": 4,
+    "fields": {
+      "row": 2,
+      "seat": 5,
+      "performance": 3,
+      "reservation": 1
+    }
+  },
+  {
+    "model": "Theatre.ticket",
+    "pk": 5,
+    "fields": {
+      "row": 3,
+      "seat": 8,
+      "performance": 5,
+      "reservation": 2
+    }
+  }
+]

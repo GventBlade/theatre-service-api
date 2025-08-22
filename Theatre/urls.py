@@ -14,11 +14,11 @@ from .views import (
 router = DefaultRouter()
 router.register("plays", PlayViewSet)
 router.register("theatre-halls", TheatreHallViewSet)
-router.register("performances", PerformanceViewSet)
+router.register("performances", PerformanceViewSet, basename="performance")
 router.register("actors", ActorViewSet)
 router.register("genres", GenreViewSet)
-router.register("reservations", ReservationViewSet)
-router.register("tickets", TicketViewSet)
+router.register("reservations", ReservationViewSet, basename="reservation")
+router.register("tickets", TicketViewSet, basename="ticket")
 
 urlpatterns = [
     path("", include(router.urls)),

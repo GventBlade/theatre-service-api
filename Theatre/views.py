@@ -1,22 +1,23 @@
+from django.db.models import F, Count
 from rest_framework import viewsets
 from Theatre.models import (
     Play, TheatreHall, Performance, Actor, Genre, Reservation, Ticket
 )
 from Theatre.serializers import (
     PlaySerializer, PlayListSerializer, PlayRetrieveSerializer,
-    TheatreHallSerializer,
-    PerformanceSerializer, PerformanceListSerializer, PerformanceRetrieveSerializer,
-    ActorSerializer, GenreSerializer,
-    ReservationSerializer, ReservationListSerializer, ReservationRetrieveSerializer,
-    TicketSerializer, TicketListSerializer
+    TheatreHallSerializer, PerformanceListSerializer, PerformanceRetrieveSerializer,
+    GenreSerializer, PerformanceSerializer,
+    ReservationSerializer,
+    TicketSerializer, TicketListSerializer, ActorListSerializer, ActorRetrieveSerializer, ActorSerializer,
+    TicketRetrieveSerializer
 )
 
-from permissions import IsAdminOrAuthenticatedOrReadOnly
+from permissions import IsAdminOrReadOnly, IsAdminOrOwner
 
 
 class PlayViewSet(viewsets.ModelViewSet):
-    queryset = Play.objects.prefetch_related("actors", "genres").all()
-    permission_classes = (IsAdminOrAuthenticatedOrReadOnly,)
+    queryset = Play.objects.all().prefetch_related("actors", "genres")
+    permission_classes = (IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -29,12 +30,12 @@ class PlayViewSet(viewsets.ModelViewSet):
 class TheatreHallViewSet(viewsets.ModelViewSet):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
-    permission_classes = (IsAdminOrAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
-    queryset = Performance.objects.select_related("play", "theatre_hall")\
-                                  .prefetch_related("ticket_set").all()
+    queryset = Performance.objects.all()
+    permission_classes = (IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -43,37 +44,82 @@ class PerformanceViewSet(viewsets.ModelViewSet):
             return PerformanceRetrieveSerializer
         return PerformanceSerializer
 
+    def get_queryset(self):
+        queryset = Performance.objects.all()
+
+        if self.action == "list":
+            queryset = (
+                queryset
+                .select_related("play", "theatre_hall")
+                .annotate(
+                    available_seats=F("theatre_hall__rows") * F("theatre_hall__seats_in_row") - Count("ticket")
+                )
+            )
+        elif self.action == "retrieve":
+            queryset = (
+                queryset
+                .select_related("play", "theatre_hall")
+                .prefetch_related("ticket_set__reservation")
+            )
+        return queryset
+
 
 class ActorViewSet(viewsets.ModelViewSet):
     queryset = Actor.objects.prefetch_related("plays").all()
-    serializer_class = ActorSerializer
-    permission_classes = (IsAdminOrAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ActorListSerializer
+        if self.action in ["create", "update", "partial_update"]:
+            return ActorSerializer
+        return ActorRetrieveSerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.prefetch_related("plays").all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = Reservation.objects.select_related("user")\
-                                  .prefetch_related("ticket_set__performance").all()
-    permission_classes = (IsAdminOrAuthenticatedOrReadOnly,)
+    # Додайте queryset на рівні класу
+    # Це дозволить router'у правильно зареєструвати маршрути
+    queryset = Reservation.objects.all()
+
+    permission_classes = (IsAdminOrOwner,)
+
+    def get_queryset(self):
+        # Оптимізуйте запити тут
+        queryset = self.queryset.select_related("user").prefetch_related(
+            "tickets__performance__play", "tickets__performance__theatre_hall"
+        )
+
+        # Фільтруйте об'єкти, щоб користувач бачив лише свої.
+        # Адміністратор бачить все.
+        if self.request.user.is_staff:
+            return queryset
+        return queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == "list":
-            return ReservationListSerializer
-        if self.action == "retrieve":
-            return ReservationRetrieveSerializer
+        # ... (Ваша логіка для серіалізаторів)
         return ReservationSerializer
 
 
 class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.select_related("performance", "reservation").all()
-    permission_classes = (IsAdminOrAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrOwner,)
+
+    def get_queryset(self):
+        queryset = Ticket.objects.select_related("performance__play", "performance__theatre_hall", "reservation__user")
+        if self.request.user.is_staff:
+            return queryset
+        return queryset.filter(reservation__user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == "list":
             return TicketListSerializer
+            # Для детального перегляду використовуємо TicketRetrieveSerializer
+        if self.action == "retrieve":
+            return TicketRetrieveSerializer
+            # Для створення/оновлення - TicketSerializer
         return TicketSerializer

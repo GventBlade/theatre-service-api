@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Theatre.apps.TheatreConfig',
     'user',
-    "debug_toolbar"
+    "debug_toolbar",
+    "rest_framework",
+    'drf_spectacular',
 ]
 
 AUTH_USER_MODEL = 'user.User'
@@ -57,16 +59,24 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    "rest_framework.authentication.SessionAuthentication",
+    "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-"DEFAULT_THROTTLE_CLASSES": [
+    "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.UserRateThrottle",
         "rest_framework.throttling.AnonRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "user": "1000/day",
-        "anon": "30/day",
+        "user": "10000/day",
+        "anon": "300/day",
     },
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -161,8 +171,17 @@ INTERNAL_IPS = [
 ]
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Theatre API',
-    'DESCRIPTION': 'API documentation for Theatre project',
+    'TITLE': 'Bus Station API',
+    'DESCRIPTION': 'Order tickets for theatre plays',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "defaultModelRendering": "model",
+        "defaultModelsExpandDepth": 2,
+        "defaultModelExpandDepth": 2,
+    }
 }
+
+LOGIN_REDIRECT_URL = '/api/theatre/reservations/'
+LOGOUT_REDIRECT_URL = '/api-auth/login/'

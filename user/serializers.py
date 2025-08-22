@@ -1,3 +1,5 @@
+# user/serializers.py
+
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from django.utils.translation import gettext as _
@@ -6,7 +8,7 @@ from django.utils.translation import gettext as _
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ("id", "email", "password",  "is_staff")
+        fields = ("id", "email", "password", "is_staff", "first_name", "last_name")
         read_only_fields = ("id", "is_staff")
         extra_kwargs = {
             "password": {
@@ -18,10 +20,12 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        """ create user with encrypted password """
         return get_user_model().objects.create_user(**validated_data)
 
 
     def update(self, instance, validated_data):
+        """ update user with encrypted password """
         password = validated_data.pop("password", None)
         user = super().update(instance=instance, validated_data=validated_data)
 
@@ -60,8 +64,8 @@ class AuthTokenSerializer(serializers.Serializer):
                 msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
         else:
-            msg = _('Must include "username" and "password".')
+            msg = _('Must include "email" and "password".')
             raise serializers.ValidationError(msg, code='authorization')
 
         attrs['user'] = user
-        return
+        return attrs
