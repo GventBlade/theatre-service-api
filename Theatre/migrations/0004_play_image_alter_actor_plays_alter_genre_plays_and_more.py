@@ -6,27 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Theatre', '0003_rename_play_actor_plays_rename_play_genre_plays'),
+        ("Theatre", "0003_rename_play_actor_plays_rename_play_genre_plays"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='play',
-            name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='plays/'),
+            model_name="play",
+            name="image",
+            field=models.ImageField(blank=True, null=True, upload_to="plays/"),
         ),
         migrations.AlterField(
-            model_name='actor',
-            name='plays',
-            field=models.ManyToManyField(related_name='actors', to='Theatre.play'),
+            model_name="actor",
+            name="plays",
+            field=models.ManyToManyField(related_name="actors", to="Theatre.play"),
         ),
         migrations.AlterField(
-            model_name='genre',
-            name='plays',
-            field=models.ManyToManyField(related_name='genres', to='Theatre.play'),
+            model_name="genre",
+            name="plays",
+            field=models.ManyToManyField(related_name="genres", to="Theatre.play"),
         ),
         migrations.AlterUniqueTogether(
-            name='ticket',
-            unique_together={('row', 'seat', 'performance')},
+            name="ticket",
+            unique_together={("row", "seat", "performance")},
         ),
     ]

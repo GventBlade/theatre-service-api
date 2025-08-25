@@ -8,7 +8,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     Allows read-only access for all, but full access for admins.
     Suitable for public data like plays or halls.
     """
-    message = 'You do not have permission to perform this action.'
+
+    message = "You do not have permission to perform this action."
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -17,7 +18,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 
 class IsAdminOrOwner(permissions.BasePermission):
-    message = 'You do not have permission to access this page or object.'
+    message = "You do not have permission to access this page or object."
 
     def has_permission(self, request, view):
         if request.user.is_staff:
@@ -30,5 +31,5 @@ class IsAdminOrOwner(permissions.BasePermission):
 
         # Check if the user is the owner of the object.
         # This assumes the object has a 'user' or 'reservation.user' attribute.
-        owner = getattr(obj, 'user', None) or getattr(obj.reservation, 'user', None)
+        owner = getattr(obj, "user", None) or getattr(obj.reservation, "user", None)
         return owner == request.user

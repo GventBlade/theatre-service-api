@@ -49,7 +49,9 @@ def test_user_serializer_invalid():
 
 @pytest.mark.django_db
 def test_auth_token_serializer_missing_email(request_context):
-    serializer = AuthTokenSerializer(data={"password": "somepass"}, context=request_context)
+    serializer = AuthTokenSerializer(
+        data={"password": "somepass"}, context=request_context
+    )
     assert not serializer.is_valid()
     assert "email" in serializer.errors
 
@@ -61,11 +63,16 @@ def test_auth_token_serializer_invalid_password(user_data, request_context):
     bad = {"email": user_data["email"], "password": "wrongpass"}
     serializer = AuthTokenSerializer(data=bad, context=request_context)
     assert not serializer.is_valid()
-    assert "non_field_errors" in serializer.errors or "non_field_errors" in serializer.errors.keys()
+    assert (
+        "non_field_errors" in serializer.errors
+        or "non_field_errors" in serializer.errors.keys()
+    )
 
 
 @pytest.mark.django_db
 def test_auth_token_serializer_missing_email(request_context):
-    serializer = AuthTokenSerializer(data={"password": "somepass"}, context=request_context)
+    serializer = AuthTokenSerializer(
+        data={"password": "somepass"}, context=request_context
+    )
     assert not serializer.is_valid()
     assert "email" in serializer.errors

@@ -4,15 +4,28 @@ from django.db.models import F, Count
 from rest_framework.test import APIRequestFactory
 
 from Theatre.models import (
-    Play, TheatreHall, Performance, Actor, Genre, Ticket, Reservation
+    Play,
+    TheatreHall,
+    Performance,
+    Actor,
+    Genre,
+    Ticket,
+    Reservation,
 )
 from Theatre.serializers import (
-    PlaySerializer, PlayRetrieveSerializer,
+    PlaySerializer,
+    PlayRetrieveSerializer,
     TheatreHallSerializer,
-    PerformanceSerializer, PerformanceListSerializer, PerformanceRetrieveSerializer,
-    ActorSerializer, ActorListSerializer, ActorRetrieveSerializer,
+    PerformanceSerializer,
+    PerformanceListSerializer,
+    PerformanceRetrieveSerializer,
+    ActorSerializer,
+    ActorListSerializer,
+    ActorRetrieveSerializer,
     GenreSerializer,
-    TicketSerializer, TicketListSerializer, TicketRetrieveSerializer
+    TicketSerializer,
+    TicketListSerializer,
+    TicketRetrieveSerializer,
 )
 
 
@@ -55,7 +68,9 @@ def test_play_serializer_create():
 
 
 @pytest.mark.django_db
-def test_play_retrieve_serializer(play_instance, actor_instance, genre_instance, factory):
+def test_play_retrieve_serializer(
+    play_instance, actor_instance, genre_instance, factory
+):
     request = factory.get("/")
     serializer = PlayRetrieveSerializer(play_instance, context={"request": request})
     data = serializer.data
@@ -81,33 +96,36 @@ def test_performance_serializer(play_instance, theatre_hall_instance):
 
 
 @pytest.mark.django_db
-def test_performance_list_serializer(play_instance, theatre_hall_instance, django_user_model):
-    # Створюємо виставу
+def test_performance_list_serializer(
+    play_instance, theatre_hall_instance, django_user_model
+):
     perf = Performance.objects.create(
         play=play_instance, theatre_hall=theatre_hall_instance, show_time=timezone.now()
     )
 
-    # Створюємо користувача та бронювання
-    user = django_user_model.objects.create_user(email="test@example.com", password="pass123")
+    user = django_user_model.objects.create_user(
+        email="test@example.com", password="pass123"
+    )
     reservation = Reservation.objects.create(user=user)
 
-    # Створюємо квиток
     Ticket.objects.create(row=1, seat=1, performance=perf, reservation=reservation)
 
-    # Беремо performance через annotate, як це робить твій viewset
-    perf_qs = Performance.objects.select_related("play", "theatre_hall").annotate(
-        available_seats=F("theatre_hall__rows") * F("theatre_hall__seats_in_row") - Count("ticket")
-    ).get(id=perf.id)
+    perf_qs = (
+        Performance.objects.select_related("play", "theatre_hall")
+        .annotate(
+            available_seats=F("theatre_hall__rows") * F("theatre_hall__seats_in_row")
+            - Count("ticket")
+        )
+        .get(id=perf.id)
+    )
 
-    # Серіалізуємо
     from Theatre.serializers import PerformanceListSerializer
+
     serializer = PerformanceListSerializer(perf_qs)
     data = serializer.data
 
-    # Перевіряємо наявність і тип поля
     assert "available_seats" in data
     assert isinstance(data["available_seats"], int)
-    # Можна перевірити правильність підрахунку
     total_seats = theatre_hall_instance.rows * theatre_hall_instance.seats_in_row
     assert data["available_seats"] == total_seats - 1
 
@@ -129,13 +147,16 @@ def test_genre_serializer(genre_instance):
 
 @pytest.mark.django_db
 def test_ticket_serializers(play_instance, theatre_hall_instance, django_user_model):
-    perf = Performance.objects.create(play=play_instance,
-                                      theatre_hall=theatre_hall_instance,
-                                      show_time=timezone.now())
+    perf = Performance.objects.create(
+        play=play_instance, theatre_hall=theatre_hall_instance, show_time=timezone.now()
+    )
     user = django_user_model.objects.create_user(email="u@test.com", password="pass123")
     from Theatre.models import Reservation
+
     reservation = Reservation.objects.create(user=user)
-    ticket = Ticket.objects.create(row=1, seat=1, performance=perf, reservation=reservation)
+    ticket = Ticket.objects.create(
+        row=1, seat=1, performance=perf, reservation=reservation
+    )
 
     s1 = TicketSerializer(ticket)
     assert s1.data["row"] == 1
@@ -146,3 +167,45 @@ def test_ticket_serializers(play_instance, theatre_hall_instance, django_user_mo
 
     s3 = TicketRetrieveSerializer(ticket)
     assert s3.data["theatre_hall_name"] == "Main Hall"
+
+
+@pytest.mark.django_db
+def test_performance_list_serializer():
+    play = Play.objects.create(title="Hamlet", description="Shakespeare play")
+    hall = TheatreHall.objects.create(name="Big Hall", rows=10, seats_in_row=20)
+    performance = Performance.objects.create(
+        play=play, theatre_hall=hall, show_time="2025-08-25T19:00:00Z"
+    )
+    perf_qs = (
+        Performance.objects.select_related("play", "theatre_hall")
+        .annotate(
+            available_seats=F("theatre_hall__rows") * F("theatre_hall__seats_in_row")
+            - Count("ticket")
+        )
+        .get(id=performance.id)
+    )
+
+    serializer = PerformanceListSerializer(perf_qs)
+
+    data = serializer.data
+    assert data["id"] == performance.id
+    assert data["play_title"] == "Hamlet"
+    assert data["theatre_hall_name"] == "Big Hall"
+    assert "available_seats" in data
+    assert isinstance(data["available_seats"], int)
+
+
+@pytest.mark.django_db
+def test_performance_retrieve_serializer():
+    play = Play.objects.create(title="Macbeth", description="Another Shakespeare")
+    hall = TheatreHall.objects.create(name="Small Hall", rows=5, seats_in_row=15)
+    performance = Performance.objects.create(
+        play=play, theatre_hall=hall, show_time="2025-09-01T18:00:00Z"
+    )
+
+    serializer = PerformanceRetrieveSerializer(performance)
+
+    assert serializer.data["id"] == performance.id
+    assert serializer.data["play"]["title"] == "Macbeth"
+    assert serializer.data["theatre_hall"]["name"] == "Small Hall"
+    assert serializer.data["show_time"] == "2025-09-01T18:00:00Z"
