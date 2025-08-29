@@ -80,14 +80,16 @@ class TheatreHallSerializer(serializers.ModelSerializer):
 
 
 class PerformanceSerializer(serializers.ModelSerializer):
-    play_title = serializers.CharField(source="play.title", read_only=True)
-    theatre_hall_name = serializers.CharField(
-        source="theatre_hall.name", read_only=True
+    play = serializers.PrimaryKeyRelatedField(
+        queryset=Play.objects.all()
+    )
+    theatre_hall = serializers.PrimaryKeyRelatedField(
+        queryset=TheatreHall.objects.all()
     )
 
     class Meta:
         model = Performance
-        fields = ("id", "show_time", "play_title", "theatre_hall_name")
+        fields = ("id", "show_time", "play", "theatre_hall")
 
 
 class PerformanceListSerializer(serializers.ModelSerializer):

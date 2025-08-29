@@ -1,6 +1,7 @@
 import pytest
 from django.utils import timezone
 from django.db.models import F, Count
+from django.contrib.auth import get_user_model
 from rest_framework.test import APIRequestFactory
 
 from Theatre.models import (
@@ -9,8 +10,8 @@ from Theatre.models import (
     Performance,
     Actor,
     Genre,
-    Ticket,
     Reservation,
+    Ticket,
 )
 from Theatre.serializers import (
     PlaySerializer,
@@ -19,7 +20,6 @@ from Theatre.serializers import (
     PerformanceSerializer,
     PerformanceListSerializer,
     PerformanceRetrieveSerializer,
-    ActorSerializer,
     ActorListSerializer,
     ActorRetrieveSerializer,
     GenreSerializer,
@@ -35,30 +35,30 @@ def factory():
 
 
 @pytest.fixture
-def play_instance():
+def play_instance(db):
     return Play.objects.create(title="Hamlet", description="A Shakespeare tragedy")
 
 
 @pytest.fixture
-def theatre_hall_instance():
+def theatre_hall_instance(db):
     return TheatreHall.objects.create(name="Main Hall", rows=10, seats_in_row=20)
 
 
 @pytest.fixture
-def actor_instance(play_instance):
+def actor_instance(db, play_instance):
     actor = Actor.objects.create(first_name="Tom", last_name="Hanks")
-    actor.plays.add(play_instance)
+    play_instance.actors.add(actor)
     return actor
 
 
 @pytest.fixture
-def genre_instance(play_instance):
+def genre_instance(db, play_instance):
     genre = Genre.objects.create(name="Tragedy")
-    genre.plays.add(play_instance)
+    play_instance.genres.add(genre)
     return genre
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 def test_play_serializer_create():
     data = {"title": "King Lear", "description": "Another Shakespeare tragedy"}
     serializer = PlaySerializer(data=data)
@@ -68,15 +68,15 @@ def test_play_serializer_create():
 
 
 @pytest.mark.django_db
-def test_play_retrieve_serializer(
-    play_instance, actor_instance, genre_instance, factory
-):
+def test_play_retrieve_serializer(play_instance, actor_instance, genre_instance):
+    factory = APIRequestFactory()
     request = factory.get("/")
     serializer = PlayRetrieveSerializer(play_instance, context={"request": request})
     data = serializer.data
+
     assert data["title"] == "Hamlet"
     assert "Tragedy" in data["genres"]
-    assert "Tom Hanks" in data["actors"]
+    assert actor_instance.full_name in data["actors"]
 
 
 @pytest.mark.django_db
@@ -91,46 +91,60 @@ def test_performance_serializer(play_instance, theatre_hall_instance):
         play=play_instance, theatre_hall=theatre_hall_instance, show_time=timezone.now()
     )
     serializer = PerformanceSerializer(perf)
-    assert serializer.data["play_title"] == "Hamlet"
-    assert serializer.data["theatre_hall_name"] == "Main Hall"
+    assert serializer.data["play"] == play_instance.id
+    assert serializer.data["theatre_hall"] == theatre_hall_instance.id
 
 
-@pytest.mark.django_db
-def test_performance_list_serializer(
-    play_instance, theatre_hall_instance, django_user_model
-):
+@pytest.mark.django_db(transaction=True)
+def test_performance_list_serializer(play_instance, theatre_hall_instance):
     perf = Performance.objects.create(
         play=play_instance, theatre_hall=theatre_hall_instance, show_time=timezone.now()
     )
-
-    user = django_user_model.objects.create_user(
-        email="test@example.com", password="pass123"
-    )
+    User = get_user_model()
+    user = User.objects.create_user(email="test@example.com", password="pass123")
     reservation = Reservation.objects.create(user=user)
-
     Ticket.objects.create(row=1, seat=1, performance=perf, reservation=reservation)
 
     perf_qs = (
         Performance.objects.select_related("play", "theatre_hall")
         .annotate(
             available_seats=F("theatre_hall__rows") * F("theatre_hall__seats_in_row")
-            - Count("ticket")
+            - Count("tickets")
         )
         .get(id=perf.id)
     )
 
-    from Theatre.serializers import PerformanceListSerializer
-
     serializer = PerformanceListSerializer(perf_qs)
     data = serializer.data
-
-    assert "available_seats" in data
-    assert isinstance(data["available_seats"], int)
     total_seats = theatre_hall_instance.rows * theatre_hall_instance.seats_in_row
     assert data["available_seats"] == total_seats - 1
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
+def test_performance_retrieve_serializer(play_instance, theatre_hall_instance):
+    perf = Performance.objects.create(
+        play=play_instance,
+        theatre_hall=theatre_hall_instance,
+        show_time="2025-08-25T19:00:00Z"
+    )
+
+    User = get_user_model()
+    user = User.objects.create_user(email="u@test.com", password="pass123")
+    reservation = user.reservation_set.create()
+    Ticket.objects.create(row=1, seat=1, performance=perf, reservation=reservation)
+
+    serializer = PerformanceRetrieveSerializer(perf)
+    data = serializer.data
+
+    assert data["play"]["title"] == "Hamlet"
+    assert data["theatre_hall"]["name"] == "Main Hall"
+    assert len(data["tickets"]) == 1
+    ticket_data = data["tickets"][0]
+    assert ticket_data["row"] == 1
+    assert ticket_data["seat"] == 1
+
+
+@pytest.mark.django_db(transaction=True)
 def test_actor_list_and_retrieve_serializer(actor_instance):
     serializer = ActorListSerializer(actor_instance)
     assert serializer.data["full_name"] == "Tom Hanks"
@@ -139,24 +153,21 @@ def test_actor_list_and_retrieve_serializer(actor_instance):
     assert any(p["title"] == "Hamlet" for p in retrieve.data["plays"])
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 def test_genre_serializer(genre_instance):
     serializer = GenreSerializer(genre_instance)
     assert serializer.data["name"] == "Tragedy"
 
 
-@pytest.mark.django_db
-def test_ticket_serializers(play_instance, theatre_hall_instance, django_user_model):
+@pytest.mark.django_db(transaction=True)
+def test_ticket_serializers(play_instance, theatre_hall_instance):
     perf = Performance.objects.create(
         play=play_instance, theatre_hall=theatre_hall_instance, show_time=timezone.now()
     )
-    user = django_user_model.objects.create_user(email="u@test.com", password="pass123")
-    from Theatre.models import Reservation
-
+    User = get_user_model()
+    user = User.objects.create_user(email="u@test.com", password="pass123")
     reservation = Reservation.objects.create(user=user)
-    ticket = Ticket.objects.create(
-        row=1, seat=1, performance=perf, reservation=reservation
-    )
+    ticket = Ticket.objects.create(row=1, seat=1, performance=perf, reservation=reservation)
 
     s1 = TicketSerializer(ticket)
     assert s1.data["row"] == 1
@@ -167,45 +178,3 @@ def test_ticket_serializers(play_instance, theatre_hall_instance, django_user_mo
 
     s3 = TicketRetrieveSerializer(ticket)
     assert s3.data["theatre_hall_name"] == "Main Hall"
-
-
-@pytest.mark.django_db
-def test_performance_list_serializer():
-    play = Play.objects.create(title="Hamlet", description="Shakespeare play")
-    hall = TheatreHall.objects.create(name="Big Hall", rows=10, seats_in_row=20)
-    performance = Performance.objects.create(
-        play=play, theatre_hall=hall, show_time="2025-08-25T19:00:00Z"
-    )
-    perf_qs = (
-        Performance.objects.select_related("play", "theatre_hall")
-        .annotate(
-            available_seats=F("theatre_hall__rows") * F("theatre_hall__seats_in_row")
-            - Count("ticket")
-        )
-        .get(id=performance.id)
-    )
-
-    serializer = PerformanceListSerializer(perf_qs)
-
-    data = serializer.data
-    assert data["id"] == performance.id
-    assert data["play_title"] == "Hamlet"
-    assert data["theatre_hall_name"] == "Big Hall"
-    assert "available_seats" in data
-    assert isinstance(data["available_seats"], int)
-
-
-@pytest.mark.django_db
-def test_performance_retrieve_serializer():
-    play = Play.objects.create(title="Macbeth", description="Another Shakespeare")
-    hall = TheatreHall.objects.create(name="Small Hall", rows=5, seats_in_row=15)
-    performance = Performance.objects.create(
-        play=play, theatre_hall=hall, show_time="2025-09-01T18:00:00Z"
-    )
-
-    serializer = PerformanceRetrieveSerializer(performance)
-
-    assert serializer.data["id"] == performance.id
-    assert serializer.data["play"]["title"] == "Macbeth"
-    assert serializer.data["theatre_hall"]["name"] == "Small Hall"
-    assert serializer.data["show_time"] == "2025-09-01T18:00:00Z"

@@ -1,85 +1,5 @@
 [
   {
-    "model": "Theatre.play",
-    "pk": 1,
-    "fields": {
-      "title": "Hamlet",
-      "description": "A tragedy by William Shakespeare"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 2,
-    "fields": {
-      "title": "Romeo and Juliet",
-      "description": "A tragic love story by William Shakespeare"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 3,
-    "fields": {
-      "title": "King Lear",
-      "description": "A tragedy about power and madness"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 4,
-    "fields": {
-      "title": "A Midsummer Night's Dream",
-      "description": "A comedy by William Shakespeare"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 5,
-    "fields": {
-      "title": "Uncle Vanya",
-      "description": "A play by Anton Chekhov"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 6,
-    "fields": {
-      "title": "The Cherry Orchard",
-      "description": "A play by Anton Chekhov about a family's struggle"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 7,
-    "fields": {
-      "title": "Waiting for Godot",
-      "description": "An absurdist play by Samuel Beckett"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 8,
-    "fields": {
-      "title": "Death of a Salesman",
-      "description": "A tragedy by Arthur Miller"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 9,
-    "fields": {
-      "title": "The Glass Menagerie",
-      "description": "A memory play by Tennessee Williams"
-    }
-  },
-  {
-    "model": "Theatre.play",
-    "pk": 10,
-    "fields": {
-      "title": "Our Town",
-      "description": "A play by Thornton Wilder"
-    }
-  },
-  {
     "model": "Theatre.genre",
     "pk": 1,
     "fields": {
@@ -230,6 +150,106 @@
     }
   },
   {
+    "model": "Theatre.play",
+    "pk": 1,
+    "fields": {
+      "title": "Hamlet",
+      "description": "A tragedy by William Shakespeare",
+      "genres": [1, 5],
+      "actors": [1, 2, 3]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 2,
+    "fields": {
+      "title": "Romeo and Juliet",
+      "description": "A tragic love story by William Shakespeare",
+      "genres": [1, 9],
+      "actors": [4, 5]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 3,
+    "fields": {
+      "title": "King Lear",
+      "description": "A tragedy about power and madness",
+      "genres": [1],
+      "actors": [6, 7]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 4,
+    "fields": {
+      "title": "A Midsummer Night's Dream",
+      "description": "A comedy by William Shakespeare",
+      "genres": [2, 6],
+      "actors": [8]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 5,
+    "fields": {
+      "title": "Uncle Vanya",
+      "description": "A play by Anton Chekhov",
+      "genres": [3],
+      "actors": [9, 10]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 6,
+    "fields": {
+      "title": "The Cherry Orchard",
+      "description": "A play by Anton Chekhov about a family's struggle",
+      "genres": [3, 10],
+      "actors": [1, 4]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 7,
+    "fields": {
+      "title": "Waiting for Godot",
+      "description": "An absurdist play by Samuel Beckett",
+      "genres": [5],
+      "actors": [2, 5, 7]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 8,
+    "fields": {
+      "title": "Death of a Salesman",
+      "description": "A tragedy by Arthur Miller",
+      "genres": [1, 3],
+      "actors": [3, 6, 8]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 9,
+    "fields": {
+      "title": "The Glass Menagerie",
+      "description": "A memory play by Tennessee Williams",
+      "genres": [3],
+      "actors": [1, 9, 10]
+    }
+  },
+  {
+    "model": "Theatre.play",
+    "pk": 10,
+    "fields": {
+      "title": "Our Town",
+      "description": "A play by Thornton Wilder",
+      "genres": [3, 10],
+      "actors": [2, 4, 7]
+    }
+  },
+  {
     "model": "Theatre.theatrehall",
     "pk": 1,
     "fields": {
@@ -261,7 +281,6 @@
     "pk": 1,
     "fields": {
       "email": "user1@example.com",
-      "username": "user1@example.com",
       "password": "pbkdf2_sha256$260000$hQ1lG3f9d5y2eL7b$F9g2h1j3k4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4",
       "is_staff": false,
       "is_active": true
@@ -272,7 +291,6 @@
     "pk": 2,
     "fields": {
       "email": "user2@example.com",
-      "username": "user2@example.com",
       "password": "pbkdf2_sha256$260000$hQ1lG3f9d5y2eL7b$F9g2h1j3k4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4",
       "is_staff": false,
       "is_active": true

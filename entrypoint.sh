@@ -5,12 +5,8 @@ done
 echo "Postgres started"
 
 python manage.py migrate --noinput
+python manage.py loaddata initial_data.json
 
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(email='admin@example.com').exists() or User.objects.create_superuser('admin@example.com', 'admin')" | python manage.py shell
+python manage.py collectstatic --noinput
 
-if [ -f "./initial_data.json" ]; then
-    python manage.py loaddata initial_data.json
-    echo "Initial data loaded"
-fi
-
-exec "$@"
+exec gunicorn theatre_service_api.wsgi:application --bind 0.0.0.0:8000

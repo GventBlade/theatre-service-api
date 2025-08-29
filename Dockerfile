@@ -1,19 +1,28 @@
-FROM python:3.13.6-slim
+FROM python:3.12-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential gcc \
-    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+RUN useradd -m appuser
+WORKDIR /code
 
 COPY requirements.txt .
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    netcat-openbsd \
+    && pip install --no-cache-dir -r requirements.txt \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN useradd -m appuser
+RUN chmod +x /code/entrypoint.sh
+
+RUN chown -R appuser:appuser /code
 USER appuser
 
-command: ["sh", "/code/entrypoint.sh", "gunicorn", "theatre_service_api.wsgi:application", "--bind", "0.0.0.0:8000"]
-
+ENTRYPOINT ["sh", "/code/entrypoint.sh"]
+CMD ["gunicorn", "theatre_service_api.wsgi:application", "--bind", "0.0.0.0:8000"]

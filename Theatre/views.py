@@ -66,11 +66,11 @@ class PerformanceViewSet(viewsets.ModelViewSet):
             queryset = queryset.select_related("play", "theatre_hall").annotate(
                 available_seats=F("theatre_hall__rows")
                 * F("theatre_hall__seats_in_row")
-                - Count("ticket")
+                - Count("tickets")
             )
         elif self.action == "retrieve":
             queryset = queryset.select_related("play", "theatre_hall").prefetch_related(
-                "ticket_set__reservation"
+                "tickets__reservation"
             )
         return queryset
 
