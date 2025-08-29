@@ -5,6 +5,12 @@ It provides functionality for managing plays, actors, genres, theatre halls, per
 The project is containerized with **Docker** and uses **PostgreSQL** as the database.  
 
 ---
+## Database Schema
+
+The following ER diagram illustrates the data structure and relationships between the models in this project:
+
+![Theatre ER Diagram](media/theatre_diagram.png)
+
 
 ## 🚀 Features
 
