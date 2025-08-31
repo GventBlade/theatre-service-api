@@ -1,29 +1,32 @@
-# IDE
-.idea/
-*.iml
+# Python
+__pycache__/
+*.pyс
+*.pyo
+*.pyd
+
+# Django
+*.log
+db.sqlite3
+media/
 
 # Virtual environment
 .venv/
 venv/
+ENV/
 env/
 
-# Python-specific files
-__pycache__/
-*.pyc
-*.pyo
+# IDE
+.idea/
+.vscode/
 
-# Django-specific files
-# Static and media files
-/staticfiles/
-/media/
-
-# Database files
-*.sqlite3
-
-# Test-related files
-.pytest_cache/
-.coverage
-
-# OS-generated files
+# System files
 .DS_Store
 Thumbs.db
+
+# Environment variables
+.env
+
+# Docker
+*.pid
+*.seed
+*.bak
