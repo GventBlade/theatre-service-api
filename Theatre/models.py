@@ -1,3 +1,75 @@
+from django.conf import settings
 from django.db import models
 
-# Create your models here.
+
+class Actor(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return f"Full Name:  {self.full_name}"
+
+
+class Genre(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name}"
+
+class Play(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    image = models.ImageField(upload_to="plays/", blank=True, null=True)
+    genres = models.ManyToManyField(Genre, related_name="plays")
+    actors = models.ManyToManyField(Actor, related_name="plays")
+
+    def __str__(self):
+        return f"Title: {self.title}"
+
+
+class TheatreHall(models.Model):
+    name = models.CharField(max_length=100)
+    rows = models.IntegerField()
+    seats_in_row = models.IntegerField()
+
+    def __str__(self):
+        return f"Name:{self.name}, Rows:{self.rows}, Seats:{self.seats_in_row}"
+
+
+class Performance(models.Model):
+    play = models.ForeignKey(Play, on_delete=models.CASCADE)
+    theatre_hall = models.ForeignKey(TheatreHall, on_delete=models.CASCADE)
+    show_time = models.DateTimeField()
+
+    def __str__(self):
+        return (f"Play:{self.play}, TheatreHall: {self.theatre_hall},"
+                f" Show Time: {self.show_time}")
+
+
+class Reservation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"User: {self.user}"
+
+
+class Ticket(models.Model):
+    row = models.IntegerField()
+    seat = models.IntegerField()
+    performance = models.ForeignKey(Performance, on_delete=models.CASCADE,
+                                    related_name="tickets")
+    reservation = models.ForeignKey(
+        Reservation, on_delete=models.CASCADE, related_name="tickets"
+    )
+
+    class Meta:
+        unique_together = ("row", "seat", "performance")
+
+    def __str__(self):
+        return (f"Row: {self.row}, Seat: {self.seat}, Performance: {self.performance},"
+                f" Reservation: {self.reservation} ")

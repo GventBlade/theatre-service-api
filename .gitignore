@@ -1,2 +1,32 @@
-.idea
-.venv
+# Python
+__pycache__/
+*.pyс
+*.pyo
+*.pyd
+
+# Django
+*.log
+db.sqlite3
+media/
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Docker
+*.pid
+*.seed
+*.bak
